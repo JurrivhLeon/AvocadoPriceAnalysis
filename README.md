@@ -7,6 +7,8 @@ The source code for analysis is in ```analysis.R```. To run it successfully you 
 ```r
 install.packages(c('ggplot2', 'ggpubr', 'ggthemes', 'extrafont', 'LSTS'))
 install.packages('reticulate')
+conda_create('r-reticulate')
+use_condaenv('r-reticulate')
 install.packages('keras')
 library('keras')
 install_keras()
