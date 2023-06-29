@@ -6,4 +6,11 @@ volume of conventional avocados in Total U.S.. The preprocessed dataset is uploa
 The source code for analysis is in ```analysis.R```. To run it successfully you may need to install Keras and Tensorflow in R.
 ```R
 install.packages(c('ggplot2', 'ggpubr', 'ggthemes', 'extrafont', 'LSTS'))
+install.packages('reticulate')
+install.packages('keras')
+library('keras')
+install_keras()
+install.packages('tensorflow')
+library('tensorflow')
+install_tensorflow()
 ```
