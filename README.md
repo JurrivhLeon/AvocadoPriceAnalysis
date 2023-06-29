@@ -4,7 +4,7 @@ I choose the Avocado Prices (2020 updated version) Dataset from Kaggle. The raw 
 volume of conventional avocados in Total U.S.. The preprocessed dataset is uploaded to ```avocado-conventional.CSV```.
 
 The source code for analysis is in ```analysis.R```. To run it successfully you may need to install Keras and Tensorflow in R.
-```R
+```r
 install.packages(c('ggplot2', 'ggpubr', 'ggthemes', 'extrafont', 'LSTS'))
 install.packages('reticulate')
 install.packages('keras')
