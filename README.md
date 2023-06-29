@@ -16,3 +16,10 @@ install.packages('tensorflow')
 library('tensorflow')
 install_tensorflow()
 ```
+
+Or you can install them in your conda environment through anaconda prompt:
+```
+conda activate r-reticulate
+pip install keras
+pip install tensorflow
+```
