@@ -25,4 +25,4 @@ pip install tensorflow
 ```
 
 Plot of the time series:
-![avatar](tsplot.png)
+![avatar](figs/tsplot.png)
