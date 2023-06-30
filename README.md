@@ -30,7 +30,7 @@ Plot of the time series:
 
 ACF and PACF:
 <p>
-  <img src='figs/acf.png' width='420'/><img src='figs/pacf.png' width='420'/>
+  <img src='figs/acf.png' width='410'/><img src='figs/pacf.png' width='410'/>
 </p>
 
 Forecasting result of AR(1):
