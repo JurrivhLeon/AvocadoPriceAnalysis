@@ -33,6 +33,11 @@ ACF and PACF:
   <img src='figs/acf.png' width='420'/><img src='figs/pacf.png' width='420'/>
 </p>
 
-Forecasting result by AR(1):
+Forecasting result of AR(1):
+
 ![avatar](figs/arpred1.png)
 ![avatar](figs/arpred2.png)
+
+Forecasting result of LSTM (input dimensionality = 6):
+![avatar](figs/lstm1.png)
+![avatar](figs/lstm2.png)
