@@ -1,3 +1,5 @@
+# Time Series Analysis: Avocado Price Dataset.
+# Author: Junyi Liao
 library(astsa)
 library(ggplot2)
 library(ggpubr)
@@ -8,9 +10,12 @@ library(keras)
 library(tensorflow)
 loadfonts()
 
+# Set working directory and read data.
 setwd('D:/Users/Jurrivh Liao/Documents/All of statistics/Time Series and Spatial Statistics/project')
 avocado <- read.csv('avocado-conventional.csv')
 avocado$date <- as.Date(avocado$date, format = "%d/%m/%Y")
+
+# Time plot of target series.
 ggplot(avocado, aes(x=date, y=average_price)) +
   geom_line(color='#0057B7') +
   geom_smooth(color='#FFD700') +
@@ -28,6 +33,7 @@ ggplot(avocado, aes(x=date, y=average_price)) +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# Scatterplot matrix.
 price <- avocado$average_price
 volume <- avocado$total_volume / 1e6
 lag1.plot(price, 9, pch=20, col='#0057B7', lwc='#FFDD00', box.col='#FFFFFF',
@@ -37,6 +43,7 @@ lag2.plot(price, volume, 8, pch=20, col='#0057B7', lwc='#FFDD00', box.col='#FFFF
 lag2.plot(volume, price, 8, pch=20, col='#0057B7', lwc='#FFDD00', box.col='#FFFFFF',
           cex=0.8, lwl=1.5, gg=TRUE)
 
+# ACF plot.
 avocado.acf <- acf(avocado$average_price, plot=FALSE)
 avocado.acf <- with(avocado.acf, data.frame(lag, acf))
 ggplot(data = avocado.acf, mapping = aes(x = lag, y = acf)) +
@@ -55,6 +62,7 @@ ggplot(data = avocado.acf, mapping = aes(x = lag, y = acf)) +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# PACF plot.
 avocado.pacf <- pacf(avocado$average_price, plot=FALSE)
 avocado.pacf <- with(avocado.pacf, data.frame(lag, acf))
 ggplot(data = avocado.pacf, mapping = aes(x = lag, y = acf)) +
@@ -75,9 +83,10 @@ ggplot(data = avocado.pacf, mapping = aes(x = lag, y = acf)) +
   )
 
 
-# Define the training set and test set.
+# Split the training set and test set.
 train <- data.frame(t = avocado$date, data=avocado$average_price)[1:261,]
 test <- data.frame(t = avocado$date, data=avocado$average_price)[262:306,]
+# AR(1) model.
 model <- ar.yw(train$data, aic = FALSE, order.max = 1)
 # model <- ar.mle(train$data, aic = FALSE, order.max = 1)
 # model <- arima(train$data, order = c(1, 1, 0))
@@ -86,6 +95,7 @@ model <- ar.yw(train$data, aic = FALSE, order.max = 1)
 resid <- model$resid[-1]
 resid.std <- resid / sqrt(model$var.pred)
 
+# Time plot of residuals.
 ggplot(data=data.frame(x=avocado$date[2:261], y=resid.std), aes(x=x, y=y)) +
   geom_line(color='#0057B7') +
   geom_smooth(color='#FFD700') +
@@ -102,6 +112,7 @@ ggplot(data=data.frame(x=avocado$date[2:261], y=resid.std), aes(x=x, y=y)) +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# ACF of residual series.
 resid.acf <- acf(resid.std, plot=FALSE)
 resid.acf <- with(resid.acf, data.frame(lag, acf))[-1,]
 ggplot(data = resid.acf, mapping = aes(x = lag, y = acf)) +
@@ -120,6 +131,7 @@ ggplot(data = resid.acf, mapping = aes(x = lag, y = acf)) +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# Normal Q-Q plot.
 ggqqplot(data = resid.std, color = 'cornflowerblue', shape='o') +
   grids(linetype='solid') +
   labs(title = 'Normal Q-Q plot of Std Residuals',
@@ -133,6 +145,7 @@ ggqqplot(data = resid.std, color = 'cornflowerblue', shape='o') +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# Ljung-Box Q statistics.
 Box.Ljung.Test(resid, lag=20) +
   theme(text=element_text(size=12, family="Calibri"),
         axis.title.x = element_text(margin= margin(t = 7.5, unit = "pt")),
@@ -142,18 +155,26 @@ Box.Ljung.Test(resid, lag=20) +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# Metrics for different ARIMA models.
 metric <- function(model, data, k, n=261){
   resid <- model$resid
   resid[is.na(resid)] <- 0
+  # Sum of squares error.
   sse <- sum(resid ^ 2)
+  # Mean square error.
   mse <- sse / (n - k)
   sst <- sum((data - mean(data)) ^ 2)
+  # R-squared.
   rsquare <- 1 - sse / sst
+  # Akaike information criterion.
   aic <- log(sse / n) + (n + 2 * k) / n
+  # Akaike information criterion, bias corrected.
   aicc <- log(sse / n) + (n + k) / (n - k - 2)
+  # Bayesian information criterion.
   bic <- log(sse / n) + k * log(n) / n
   return(c(sse=sse, mse=mse, rsquare=rsquare, aic=aic, aicc=aicc, bic=bic))
 }
+# Fit different ARIMA models.
 ar1 <- arima(train$data, order=c(1, 0, 0), method='ML')
 metric(ar1, train$data, 2)
 ar2 <- arima(train$data, order=c(2, 0, 0), method='ML')
@@ -211,7 +232,7 @@ ggplot() +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
-# m-step forecasting.
+# Multi-step forecasting.
 fore <- predict(model, n.ahead=45)
 ggplot() +
   geom_line(aes(x=train$t, y=train$data, color='Historical')) +
@@ -264,6 +285,8 @@ lagTransform <- function(data, lag=1){
 }
 
 scaledSeries <- scaleDataset(train$data, range=c(-1, 1))
+
+# Input dimensionality.
 season <- 6
 superviseDataset <- data.frame(y=scaledSeries)
 for(i in 1:season)
@@ -291,6 +314,7 @@ LSTM %>% compile(
   metrics = c('accuracy')
 )
 
+# Train LSTM.
 epochs = 50   
 for(i in 1:epochs){
   LSTM %>% fit(x_train, y_train, epochs=1, batch_size=batch_size, 
@@ -298,6 +322,7 @@ for(i in 1:epochs){
   LSTM %>% reset_states()
 }
 
+# Multi-step forecasting, use only the training set.
 lstm_forecast <- function(model, series, n.ahead, batch_size=1){
   model %>% reset_states()
   predictions <- numeric(n.ahead + season)
@@ -338,6 +363,7 @@ ggplot() +
         plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"),
   )
 
+# One step forecasting, use training set + groundtruth.
 lstm_forecast_step <- function(model, series, input, batch_size=1){
   model %>% reset_states()
   n.ahead <- length(input)
@@ -354,6 +380,7 @@ lstm_forecast_step <- function(model, series, input, batch_size=1){
   return(predictions)
 }
 
+# Plot.
 input <- (test$data - min(train$data)) / (max(train$data) - min(train$data)) * 2 - 1
 pred <- lstm_forecast_step(LSTM, scaledSeries, input)
 output <- invTransform(pred, trange=c(min(train$data), max(train$data)))
