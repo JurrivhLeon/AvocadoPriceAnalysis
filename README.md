@@ -25,4 +25,10 @@ pip install tensorflow
 ```
 
 Plot of the time series:
+
 ![avatar](figs/tsplot.png)
+
+ACF and PACF:
+<p>
+  <img src='figs/acf.png'/><img src='figs/pacf.png'/>
+</p>
