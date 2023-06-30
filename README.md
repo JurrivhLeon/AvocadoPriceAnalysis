@@ -30,5 +30,5 @@ Plot of the time series:
 
 ACF and PACF:
 <p>
-  <img src='figs/acf.png' width='500'/><img src='figs/pacf.png' width='502'/>
+  <img src='figs/acf.png' width='400'/><img src='figs/pacf.png' width='400'/>
 </p>
